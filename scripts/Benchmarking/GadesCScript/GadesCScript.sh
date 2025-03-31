@@ -4,4 +4,6 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=20G
 
-./GadesCScript "$@"
+cd $(realpath "${0%/*}")
+
+./bin/GadesCScript "$@"

@@ -7,80 +7,7 @@
 #include <string>
 #include <complex>
 #include "rapidcsv.hpp"
-
-arma::mat arma_dist_euclid(const arma::mat& a)
-{
-  arma::mat res(a.n_cols, a.n_cols, arma::fill::none);
-  for (size_t i = 0; i < a.n_cols; ++i)
-  {
-    res.row(i) = arma::vecnorm(a.each_col() - a.col(i), 2, 0);
-  }
-  return res;
-}
-
-arma::mat arma_dist_pearson(const arma::mat& a)
-{
-  return arma::cor(a);
-}
-
-// arma doesn't suppot kendall
-
-static af::array square(const af::array& a)
-{
-  return a * a;
-}
-
-af::array af_eucl_dist1(const af::array& a)
-{
-  // int feat_len = a.dims(0); // Same as b.dims(0);
-  int alen = a.dims(1);
-
-  af::array dist_mat = af::constant(0, alen, alen);
-  for (int jj = 0; jj < alen; jj++)
-  {
-    af::array bvec = a(af::span, jj);
-    af::array bvec_tiled = af::tile(bvec, 1, alen);
-    af::array sad = af::sqrt(af::sum(square(bvec_tiled - a)));
-    dist_mat(af::span, jj) = sad.T();
-  }
-
-  return dist_mat;
-}
-
-// More memory intensive than dist1, but faster
-af::array af_eucl_dist2(const af::array& a)
-{
-  int feat_len = a.dims(0);
-  int alen = a.dims(1);
-
-  af::array a_mod = a;
-  af::array b_mod = af::moddims(a, feat_len, 1, alen);
-
-  af::array a_tiled = af::tile(a_mod, 1, 1, alen);
-  af::array b_tiled = af::tile(b_mod, 1, alen, 1);
-
-  af::array dist_mod = af::sqrt(af::sum(square(a_tiled - b_tiled)));
-  af::array dist_mat = af::moddims(dist_mod, alen, alen);
-
-  return dist_mat;
-}
-
-af::array af_pearson_dist(const af::array& a)
-{
-  int feat_len = a.dims(0);
-  int alen = a.dims(1);
-
-  af::array mean_a = af::sum(a, 0) / feat_len;
-  af::array a_diff = a - af::tile(mean_a, feat_len, 1);
-
-  af::array a_norm = af::sqrt(af::sum(square(a_diff), 0));
-
-  af::array res = af::matmul(af::transpose(a_diff), a_diff);
-  res /= af::tile(a_norm, alen, 1);
-  res /= af::tile(af::moddims(a_norm, alen, 1), 1, alen);
-
-  return res;
-}
+#include "distance_funcs.hpp"
 
 template <typename Func>
 std::vector<double> iterate(int times, Func function)
@@ -92,7 +19,6 @@ std::vector<double> iterate(int times, Func function)
     function();
     auto end = std::chrono::high_resolution_clock::now();
     measurements[i] = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
-    measurements[i] /= 1e6;
   }
   return measurements;
 }
@@ -119,7 +45,7 @@ void validate(int argc, char* argv[])
     std::exit(1);
   }
   std::string metric = argv[4];
-  std::vector valid_metrics = {"euclid", "pearson"};
+  std::vector valid_metrics = {"euclid", "pearson", "l1"};
   if (std::all_of(
         valid_metrics.begin(), valid_metrics.end(), [&](auto curr) { return metric != curr; }))
   {
@@ -174,7 +100,7 @@ int main(int argc, char* argv[])
   }
   catch (std::exception e)
   {
-    fprintf(stderr, "Caught exception when trying to create csv reader\n");
+    fprintf(stderr, "Caught exception when trying to create csv reader for %s\n", data_in.c_str());
     fprintf(stderr, "%s\n", e.what());
   }
   int col_count = doc.GetColumnCount() - 1;
@@ -197,9 +123,13 @@ int main(int argc, char* argv[])
     {
       measurements = iterate(times, [&]() { af_eucl_dist1(a); });
     }
-    else
+    else if (metric == "pearson")
     {
       measurements = iterate(times, [&]() { af_pearson_dist(a); });
+    }
+    else
+    {
+      measurements = iterate(times, [&]() { af_l1_dist(a); });
     }
   }
   else
@@ -209,9 +139,13 @@ int main(int argc, char* argv[])
     {
       measurements = iterate(times, [&]() { arma_dist_euclid(a); });
     }
-    else
+    else if (metric == "pearson")
     {
       measurements = iterate(times, [&]() { arma_dist_pearson(a); });
+    }
+    else
+    {
+      measurements = iterate(times, [&]() { arma_dist_l1(a); });
     }
   }
   arma::vec measure_vec(measurements);
