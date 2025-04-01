@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.30)
 
 project(GadesCScript LANGUAGES CXX)
 
@@ -6,10 +6,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(ArrayFire REQUIRED)
+find_package(Armadillo REQUIRED)
 
 add_library(deps INTERFACE)
-target_link_libraries(deps INTERFACE armadillo ArrayFire::af)
-target_include_directories(deps INTERFACE include)
+target_link_libraries(deps INTERFACE ${ARMADILLO_LIBRARIES} ArrayFire::af)
+target_include_directories(deps INTERFACE include ${ARMADILLO_INCLUDE_DIRS})
 
 add_executable(GadesCScript main.cpp)
 target_link_libraries(GadesCScript deps)

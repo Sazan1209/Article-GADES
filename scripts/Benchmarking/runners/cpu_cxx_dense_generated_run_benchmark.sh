@@ -1,13 +1,12 @@
 #!/bin/bash
 
 ROOT_FOLDER=$(realpath "$1")
-
-(
-  cd "$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript
+cd "$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript
+{
   cmake -S . -B buildRelease &&
   cmake --build buildRelease --config Release &&
-  cmake --install buildDebug --prefix "$PWD" --config Release
-) > /dev/null || { echo "Failed to compile script"; exit 1; }
+  cmake --install buildRelease --prefix "$PWD" --config Release
+} || { echo "Failed to compile script"; exit 1; }
 
 script="$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript/GadesCScript.sh
 
@@ -27,11 +26,12 @@ do
         input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
         folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
         mkdir -p "$folder"
-        for metric in "l1" "euclid" "pearson"
+        for metric in "l1" # "euclid" "pearson"
         do
           name="benchmark_"${method}_${metric}_${cells}x${features}
           output="$folder"/_${method}_${metric}.csv
-          sbatch --job-name=$name -o=$name "$script" "$input" $method 25 $metric "$output" || { echo "Couldn't run sbatch for some reason"; exit 1; }
+          logs="${ROOT_FOLDER}"/logs/$name
+          sbatch --job-name=$name -o "$logs" "$script" "$input" $method 25 $metric "$output" || { echo "Couldn't run sbatch for some reason"; exit 1; }
         done
       fi
     done
