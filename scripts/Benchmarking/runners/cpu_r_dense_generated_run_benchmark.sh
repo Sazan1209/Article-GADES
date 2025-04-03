@@ -2,32 +2,34 @@
 
 ROOT_FOLDER=$1
 
-script="$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript/GadesCScript.sh
+script="$ROOT_FOLDER"/scripts/Benchmarking/R_benchmarking.sh
 
 
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 
-for method in "arma" "af_cpu"
+for method in "amap" "factoextra"
 do
   for cells in "10" "100" "1000" "10000"
   do
     for features in "10" "100" "1000" "10000" "100000"
     do
       num_elements=$(( cells * features ))
+
       if [[ $num_elements > 10000000 ]]
       then
         continue
-      else
-        input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
-        folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
-        mkdir -p "$folder"
-        for metric in "euclid" "pearson"
-        do
-          name="benchmark_"${method}_${metric}_${cells}x${features}
-          output="$folder"/${method}_${metric}
-          sbatch --job-name=$name "$script" "$input" $method 25 $metric "$output" || { echo "Couldn't run sbatch for some reason"; exit 1; }
-        done
       fi
-    done
+      input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
+      folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
+      mkdir -p "$folder"
+      for metric in "l1" "kendall"
+      do
+        name="benchmark_"${method}_${metric}_${cells}x${features}
+        output="$folder"/_${method}_${metric}.csv
+        logs="${ROOT_FOLDER}"/logs/$name
+        sbatch --job-name=$name -o "$logs" "$script" "$input" $method 25 $metric "$output" FALSE FALSE
+      done
+      
+    done	
   done
 done

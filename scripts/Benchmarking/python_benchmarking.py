@@ -2,8 +2,7 @@ import os
 
 import sys
 from scipy.stats import kendalltau
-from scipy.spatial.distance import pdist
-from sklearn.metrics import pairwise_distances
+from scipy.spatial.distance import pdist, squareform
 import pandas as pd
 import numpy as np
 import time
@@ -20,7 +19,7 @@ import psutil
 def parse_args():
     parser = ArgumentParser('Python benchmarking')
     parser.add_argument('--num_threads', default=24, type=int)
-    parser.add_argument('--metric', required=True, choices=['kendall'])
+    parser.add_argument('--metric', required=True, choices=['kendall', 'l1'])
     parser.add_argument('--method', required=True, choices=['pandas', 'pythonic'])
     parser.add_argument('--input', required=True, help='Path to dataset')
     parser.add_argument('--times', required=True, help='How many times to do benchmarking', type=int)
@@ -32,8 +31,6 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     process = psutil.Process(os.getpid())
-#    if args.profile:
-#        gc.disable()
     if args.input.endswith('.mtx'):
         mtx = scipy.io.mmread(args.input)
         if args.profile:
@@ -79,10 +76,12 @@ if __name__ == '__main__':
                 for (i, j), distance in zip(list_indices, output_results):
                     output[i, j] = distance
                     output[j, i] = distance
+            else if args.metric == 'l1':
+                output = squareform(scipy.pdist(np_array, 'cityblock'))
                 
         else:
-            metric = args.metric
-            output = df.T.corr(method=metric)
+            if args.metric == 'kendall':
+                output = df.T.corr(method='kendall')
 
         if args.profile:
             result_memory_usage = process.memory_info().rss
