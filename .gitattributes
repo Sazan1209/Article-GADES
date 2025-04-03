@@ -3,3 +3,4 @@ Datasets/*.csv filter=lfs diff=lfs merge=lfs -text
 Datasets/*.mtx filter=lfs diff=lfs merge=lfs -text
 *.mtx filter=lfs diff=lfs merge=lfs -text
 *.gz filter=lfs diff=lfs merge=lfs -text
+data/*csv filter=lfs diff=lfs merge=lfs -text
