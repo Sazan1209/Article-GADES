@@ -44,28 +44,29 @@ if __name__ == '__main__':
     np_array = df.values
     print(np_array.shape)
 
-    
+
     def calculate_kendall(indices):
         i, j = indices
         return (1.0 - kendalltau(np_array[i], np_array[j]).correlation) / 2.0
-    
+
     def kendall(a, b):
         return (1.0 - kendalltau(a, b).correlation) / 2.0
 
     if args.profile:
         memories = []
     times = []
-    
+
     functions = {
         'kendall': calculate_kendall,
+        'l1': None
     }
-    
+
     function = functions[args.metric]
-    
+
     for iteration_index in tqdm(range(args.times)):
         start = time.time()
         if args.method == 'pythonic':
-            
+
             if args.metric == 'kendall':
                 list_indices = [(i, j) for i in range(0, np_array.shape[0]) for j in range(i, np_array.shape[0])]
 
@@ -76,12 +77,14 @@ if __name__ == '__main__':
                 for (i, j), distance in zip(list_indices, output_results):
                     output[i, j] = distance
                     output[j, i] = distance
-            else if args.metric == 'l1':
-                output = squareform(scipy.pdist(np_array, 'cityblock'))
-                
+            elif args.metric == 'l1':
+                output = squareform(pdist(np_array, 'cityblock'))
+
         else:
             if args.metric == 'kendall':
                 output = df.T.corr(method='kendall')
+            elif args.metric == 'l1':
+                output = df.T.corr(method=lambda a, b: np.sum(np.abs(a-b)))
 
         if args.profile:
             result_memory_usage = process.memory_info().rss
@@ -100,11 +103,11 @@ if __name__ == '__main__':
         diff = (end - start) * 1000000
 
         times.append(diff)
-    
-        result = pd.DataFrame(times)
-        result.to_csv(args.output, index=None)
-        if args.profile:
-            result_memories = pd.DataFrame(memories)
-            result_memories.to_csv(args.output.replace('.csv', '_memory.csv'), index=None)
+
+    result = pd.DataFrame(times)
+    result.to_csv(args.output, index=None)
+    if args.profile:
+        result_memories = pd.DataFrame(memories)
+        result_memories.to_csv(args.output.replace('.csv', '_memory.csv'), index=None)
 
     print(np.mean(times), np.std(times), np.max(times),times)

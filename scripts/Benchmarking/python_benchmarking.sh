@@ -1,7 +1,7 @@
 #! /bin/bash
 
-#SBATCH --partition=comet
+#SBATCH --partition=starwind
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=20G
 
-./python_benchmarking.sh "$@"
+python3 ./python_benchmarking.py "$@"
