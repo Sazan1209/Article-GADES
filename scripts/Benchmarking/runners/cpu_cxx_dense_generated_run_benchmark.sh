@@ -12,7 +12,7 @@ script="$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript/GadesCScript.sh
 
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 
-for method in "arma" "af_cpu"
+for method in "gades" #"arma" "af_cpu"
 do
   for cells in "10" "100" "1000" "10000"
   do
@@ -34,7 +34,6 @@ do
         logs="${ROOT_FOLDER}"/logs/$name
         sbatch --job-name=$name -o "$logs" "$script" "$input" $method 25 $metric "$output" || { echo "Couldn't run sbatch for some reason"; exit 1; }
       done
-      
     done
   done
 done

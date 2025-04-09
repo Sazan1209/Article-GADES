@@ -8,6 +8,7 @@
 #include <complex>
 #include "rapidcsv.hpp"
 #include "distance_funcs.hpp"
+#include "GADES.hpp"
 
 template <typename Func>
 std::vector<double> iterate(int times, Func function)
@@ -31,7 +32,7 @@ void validate(int argc, char* argv[])
     std::exit(1);
   }
   std::string method = argv[2];
-  std::vector valid_methods = {"af_cpu", "af_oneapi", "af_opencl", "arma"};
+  std::vector valid_methods = {"af_cpu", "af_oneapi", "af_opencl", "arma", "gades"};
   if (std::all_of(
         valid_methods.begin(), valid_methods.end(), [&](auto curr) { return method != curr; }))
   {
@@ -132,7 +133,7 @@ int main(int argc, char* argv[])
       measurements = iterate(times, [&]() { af_l1_dist(a); });
     }
   }
-  else
+  else if (method == "arma")
   {
     arma::mat a = arma::mat(data, row_count, col_count);
     if (metric == "euclid")
@@ -146,6 +147,24 @@ int main(int argc, char* argv[])
     else
     {
       measurements = iterate(times, [&]() { arma_dist_l1(a); });
+    }
+  }
+  else
+  {
+    MatrixView a = {.row_num = row_count, .col_num = col_count, .data = data};
+    std::vector<double> res_data(col_count * col_count);
+    MatrixView res = {.row_num = col_count, .col_num = col_count, .data = res_data.data()};
+    if (metric == "euclid")
+    {
+      std::abort();
+    }
+    else if (metric == "pearson")
+    {
+      std::abort();
+    }
+    else
+    {
+      measurements = iterate(times, [&]() { CalcDistanceL1(a, res, 0, 24); });
     }
   }
   arma::vec measure_vec(measurements);
