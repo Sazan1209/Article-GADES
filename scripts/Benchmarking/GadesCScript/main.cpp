@@ -151,9 +151,9 @@ int main(int argc, char* argv[])
   }
   else
   {
-    MatrixView a = {.row_num = row_count, .col_num = col_count, .data = data};
+    MatrixView<const double> a = {.row_num = row_count, .col_num = col_count, .data = data};
     std::vector<double> res_data(col_count * col_count);
-    MatrixView res = {.row_num = col_count, .col_num = col_count, .data = res_data.data()};
+    MatrixView<double> res = {.row_num = col_count, .col_num = col_count, .data = res_data.data()};
     if (metric == "euclid")
     {
       std::abort();
