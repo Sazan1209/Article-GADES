@@ -104,13 +104,14 @@ int main(int argc, char* argv[])
     fprintf(stderr, "Caught exception when trying to create csv reader for %s\n", data_in.c_str());
     fprintf(stderr, "%s\n", e.what());
   }
-  int col_count = doc.GetColumnCount() - 1;
-  int row_count = doc.GetRowCount() - 1;
+  // The input matrices are transposed
+  int row_count = doc.GetColumnCount() - 1;
+  int col_count = doc.GetRowCount() - 1;
   std::vector<double> data_vec;
   data_vec.reserve(col_count * row_count);
   for (int i = 1; i < col_count; ++i)
   {
-    auto curr = doc.GetColumn<double>(i);
+    auto curr = doc.GetRow<double>(i);
     data_vec.insert(data_vec.end(), curr.begin(), curr.end());
   }
   const double* data = data_vec.data();
