@@ -1,9 +1,16 @@
 #!/bin/bash
 
 ROOT_FOLDER=$(realpath "$1")
+PARTITION=$2
+
+march=($(srun --partition=$2 gcc -march=native -Q --help=target | grep march))
+march=${march[1]}
+echo "Determined march for partition ${PARTITION} is ${march}"
+
+
 cd "$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript
 {
-  cmake -S . -B buildRelease &&
+  cmake -S . -B buildRelease -D GADES_MARCH=${march} &&
   cmake --build buildRelease --config Release &&
   cmake --install buildRelease --prefix "$PWD" --config Release
 } || { echo "Failed to compile script"; exit 1; }
