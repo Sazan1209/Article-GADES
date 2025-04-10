@@ -26,9 +26,9 @@ std::vector<double> iterate(int times, Func function)
 
 void validate(int argc, char* argv[])
 {
-  if (argc != 6)
+  if (argc != 7)
   {
-    fprintf(stderr, "Expected 5 arguments, got %d\n", argc - 1);
+    fprintf(stderr, "Expected 6 arguments, got %d\n", argc - 1);
     std::exit(1);
   }
   std::string method = argv[2];
@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
   int times = atoi(argv[3]);
   std::string metric = argv[4];
   std::string output = argv[5];
+  int threads = atoi(argv[6]);
 
   try
   {
@@ -165,7 +166,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-      measurements = iterate(times, [&]() { CalcDistanceL1(a, res, 0, 24); });
+      measurements = iterate(times, [&]() { CalcDistanceL1(a, res, 0, threads); });
     }
   }
   arma::vec measure_vec(measurements);
