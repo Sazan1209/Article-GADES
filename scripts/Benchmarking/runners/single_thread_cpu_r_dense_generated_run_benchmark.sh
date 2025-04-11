@@ -14,19 +14,19 @@ do
     do
       num_elements=$(( cells * features ))
 
-      if [[ $num_elements > 10000000 ]]
+      if [[ $num_elements > 1000000 ]]
       then
         continue
       fi
       input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
-      folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
+      folder="${ROOT_FOLDER}"/results/SingleThreadGeneratedDense/${cells}_cells_${features}_features/
       mkdir -p "$folder"
       for metric in "manhattan" #"kendall"
       do
         name="benchmark_"${method}_${metric}_${cells}x${features}
         output="$folder"/_${method}_${metric}.csv
         logs="${ROOT_FOLDER}"/logs/$name
-        sbatch --job-name=$name  --cpus-per-task=24 -o "$logs" -D $(dirname $script) "$script" "$input" $method 25 $metric "$output" FALSE FALSE 24
+        sbatch --job-name=$name  --cpus-per-task=1 -o "$logs" -D $(dirname $script) "$script" "$input" $method 25 $metric "$output" FALSE FALSE 1
       done
     done
   done

@@ -11,6 +11,7 @@ metric = args[4]
 output = args[5]
 sparse = as.logical(args[6])
 profile = as.logical(args[7])
+threads = strtoi(args[8])
 
 if (profile) {
     library(profmem)
@@ -34,14 +35,13 @@ for (i in 1:times) {
 
     if (method == 'amap') {
         print('Calc dist')
-        distMatrix_mtrx <- as.matrix(Dist(t(data), method=metric, nbproc=24))
+        distMatrix_mtrx <- as.matrix(Dist(t(data), method=metric, nbproc=threads))
     } else if (method == 'factoextra') {
         if (!sparse) {
             data <- as.matrix(data)
         }
 
         distMatrix_mtrx <- as.matrix(get_dist(t(data), method = metric))
-        print('Factoextra')
     }
     end_time <- as.numeric(Sys.time()) * 1000000
     measurements[i] <- end_time - st_t

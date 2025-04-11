@@ -12,12 +12,12 @@ do
         for features in "10" "100" "1000" "10000" "100000"
         do
             num_elements=$(( cells * features ))
-            if [[ $num_elements > 10000000 ]]
+            if [[ $num_elements > 100000 ]]
             then
                 continue
             fi
             input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
-            folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features
+            folder="${ROOT_FOLDER}"/results/SingleThreadGeneratedDense/${cells}_cells_${features}_features
             mkdir -p "$folder"
 
             for metric in "l1" #"spearman" "kendall" "pearson"
@@ -26,7 +26,7 @@ do
                 name="benchmark_"${method}_${metric}_${cells}x${features}
                 output="$folder"/_${method}_${metric}.csv
                 logs="${ROOT_FOLDER}/logs/$name.out"
-                sbatch --job-name=$name -o "$logs" --cpus-per-task=24 -D $(dirname $script) "$script" --metric $metric --input "$input" --times 25 --output "$output" --method $method ||
+                sbatch --job-name=$name --cpus-per-task=1 -o "$logs" -D $(dirname $script) "$script" --metric $metric --input "$input" --times 25 --output "$output" --method $method --num_threads 1||
                 { echo "Couldn't run sbatch for some reason"; exit 1; }
             done
         done
