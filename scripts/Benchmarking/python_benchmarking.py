@@ -19,7 +19,7 @@ import psutil
 def parse_args():
     parser = ArgumentParser('Python benchmarking')
     parser.add_argument('--num_threads', default=24, type=int)
-    parser.add_argument('--metric', required=True, choices=['kendall', 'l1'])
+    parser.add_argument('--metric', required=True, choices=['kendall', 'l1', 'cosine'])
     parser.add_argument('--method', required=True, choices=['pandas', 'pythonic'])
     parser.add_argument('--input', required=True, help='Path to dataset')
     parser.add_argument('--times', required=True, help='How many times to do benchmarking', type=int)
@@ -79,13 +79,16 @@ if __name__ == '__main__':
                     output[j, i] = distance
             elif args.metric == 'l1':
                 output = squareform(pdist(np_array, 'cityblock'))
+            elif args.metric == 'cosine':
+                output = squareform(pdist(np_array, 'cosine'))
 
         else:
             if args.metric == 'kendall':
                 output = df.T.corr(method='kendall')
             elif args.metric == 'l1':
-                output = df.T.corr(method=lambda a, b: np.sum(np.abs(a-b)))
-
+                output = df.T.corr(method=lambda a, b: np.sum(np.abs(a - b)))
+            elif args.metric == 'cosine':
+                output = df.T.corr(method=lambda a, b: np.dot(a, b) / (norm(a) * norm(b)))
         if args.profile:
             result_memory_usage = process.memory_info().rss
             output_usage = sys.getsizeof(output)

@@ -29,6 +29,15 @@ inline arma::mat arma_dist_pearson(const arma::mat& a)
   return arma::cor(a);
 }
 
+inline arma::mat arma_dist_cosine(const arma::mat& a)
+{
+  arma::mat res = a.t() * a;
+  arma::vec norms = arma::sqrt(res.diag());
+  res.each_col() /= norms;
+  res.each_row() /= norms.t();
+  return res;
+}
+
 // arma doesn't suppot kendall
 
 inline static af::array square(const af::array& a)
@@ -90,18 +99,26 @@ inline af::array af_eucl_dist2(const af::array& a)
 inline af::array af_pearson_dist(const af::array& a)
 {
   int feat_len = a.dims(0);
-  int alen = a.dims(1);
 
-  af::array mean_a = af::sum(a, 0) / feat_len;
-  af::array a_diff = a - af::tile(mean_a, feat_len, 1);
+  af::array mean_a = af::mean(a);
+  af::array a_centered = a - af::tile(mean_a, feat_len, 1);
+  af::array a_norm = af::sqrt(af::sum(square(a_centered), 0));
+  a_centered /= af::tile(a_norm, feat_len, 1);
 
-  af::array a_norm = af::sqrt(af::sum(square(a_diff), 0));
+  af::array cov = af::matmul(a_centered, a_centered, AF_MAT_TRANS);
 
-  af::array res = af::matmul(a_diff, a_diff, AF_MAT_TRANS);
-  res /= af::tile(a_norm, alen, 1);
-  res /= af::tile(a_norm.T(), 1, alen);
+  return cov;
+}
 
-  return res;
+inline af::array af_cosine_dist(const af::array& a)
+{
+  int feat_len = a.dims(0);
+
+  af::array a_norm = af::sqrt(af::sum(square(a), 0));
+  af::array a_centered = a / af::tile(a_norm, feat_len, 1);
+  af::array cov = af::matmul(a_centered, a_centered, AF_MAT_TRANS);
+
+  return cov;
 }
 
 #endif  // DISTANCE_FUNCS_HPP

@@ -34,8 +34,11 @@ for (i in 1:times) {
     st_t <- as.numeric(Sys.time()) * 1000000
 
     if (method == 'amap') {
-        print('Calc dist')
-        distMatrix_mtrx <- as.matrix(Dist(t(data), method=metric, nbproc=threads))
+        if (metric == 'cosine'){
+          distMatrix_mtrx <- as.matrix(Dist(t(data), method='pearson', nbproc=threads))
+        } else {
+          distMatrix_mtrx <- as.matrix(Dist(t(data), method=metric, nbproc=threads))
+        }
     } else if (method == 'factoextra') {
         if (!sparse) {
             data <- as.matrix(data)

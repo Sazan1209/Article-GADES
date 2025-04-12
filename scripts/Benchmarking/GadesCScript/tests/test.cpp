@@ -32,6 +32,23 @@ static double calcPearson(std::span<double> a, std::span<double> b)
   return cov / (std_a * std_b);
 }
 
+static double calcCosine(std::span<double> a, std::span<double> b)
+{
+  double cov = 0.0;
+  double std_a = 0.0;
+  double std_b = 0.0;
+  for (size_t i = 0; i < a.size(); ++i)
+  {
+    cov += a[i] * b[i];
+
+    std_a += a[i] * a[i];
+    std_b += b[i] * b[i];
+  }
+  std_a = sqrt(std_a);
+  std_b = sqrt(std_b);
+  return cov / (std_a * std_b);
+}
+
 static double calcEuclid(std::span<double> a, std::span<double> b)
 {
   double res = 0.0;
@@ -93,6 +110,23 @@ TEST(Arma, Euclid)
   }
 }
 
+TEST(Arma, Cosine)
+{
+  double data[row_num * col_num];
+  init(data);
+  arma::mat a = arma::mat(data, row_num, col_num);
+  arma::mat res = arma_dist_cosine(a);
+  for (size_t i = 0; i < col_num; ++i)
+  {
+    for (size_t j = 0; j < col_num; ++j)
+    {
+      std::span a(data + i * row_num, row_num);
+      std::span b(data + j * row_num, row_num);
+      EXPECT_NEAR(calcCosine(a, b), res(i, j), 1e-9);
+    }
+  }
+}
+
 TEST(AF, Pearson)
 {
   double data[row_num * col_num];
@@ -123,6 +157,23 @@ TEST(AF, Euclid)
       std::span a(data + i * row_num, row_num);
       std::span b(data + j * row_num, row_num);
       EXPECT_NEAR(calcEuclid(a, b), res(i, j).scalar<double>(), 1e-9);
+    }
+  }
+}
+
+TEST(AF, Cosine)
+{
+  double data[row_num * col_num];
+  init(data);
+  af::array a = af::array(row_num, col_num, data);
+  af::array res = af_cosine_dist(a);
+  for (size_t i = 0; i < col_num; ++i)
+  {
+    for (size_t j = 0; j < col_num; ++j)
+    {
+      std::span a(data + i * row_num, row_num);
+      std::span b(data + j * row_num, row_num);
+      EXPECT_NEAR(calcCosine(a, b), res(i, j).scalar<double>(), 1e-9);
     }
   }
 }
