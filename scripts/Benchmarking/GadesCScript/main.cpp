@@ -130,9 +130,13 @@ int main(int argc, char* argv[])
     {
       measurements = iterate(times, [&]() { af_pearson_dist(a); });
     }
-    else
+    else if (metric == "l1")
     {
       measurements = iterate(times, [&]() { af_l1_dist(a); });
+    }
+    else if (metric == "cosine")
+    {
+      measurements = iterate(times, [&]() { af_cosine_dist(a); });
     }
   }
   else if (method == "arma")
@@ -146,9 +150,13 @@ int main(int argc, char* argv[])
     {
       measurements = iterate(times, [&]() { arma_dist_pearson(a); });
     }
-    else
+    else if (metric == "l1")
     {
       measurements = iterate(times, [&]() { arma_dist_l1(a); });
+    }
+    else if (metric == "cosine")
+    {
+      measurements = iterate(times, [&]() { arma_dist_cosine(a); });
     }
   }
   else
@@ -164,9 +172,13 @@ int main(int argc, char* argv[])
     {
       std::abort();
     }
-    else
+    else if (metric == "l1")
     {
       measurements = iterate(times, [&]() { CalcDistanceL1(a, res, 0, threads); });
+    }
+    else if (metric == "cosine")
+    {
+      measurements = iterate(times, [&]() { CalcDistanceCosine(a, res, 0, threads); });
     }
   }
   arma::vec measure_vec(measurements);
