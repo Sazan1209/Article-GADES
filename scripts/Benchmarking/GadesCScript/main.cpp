@@ -46,7 +46,7 @@ void validate(int argc, char* argv[])
     std::exit(1);
   }
   std::string metric = argv[4];
-  std::vector valid_metrics = {"euclid", "pearson", "l1"};
+  std::vector valid_metrics = {"euclid", "pearson", "l1", "cosine"};
   if (std::all_of(
         valid_metrics.begin(), valid_metrics.end(), [&](auto curr) { return metric != curr; }))
   {
