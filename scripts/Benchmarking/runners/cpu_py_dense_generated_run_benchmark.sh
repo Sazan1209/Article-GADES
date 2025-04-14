@@ -20,7 +20,7 @@ do
             folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features
             mkdir -p "$folder"
 
-            for metric in "l1" #"spearman" "kendall" "pearson"
+            for metric in "cosine" #"l1" "spearman" "kendall" "pearson"
             do
                 if [[ $metric == "kendall" && $method == "pandas" ]]; then continue; fi
                 name="benchmark_"${method}_${metric}_${cells}x${features}

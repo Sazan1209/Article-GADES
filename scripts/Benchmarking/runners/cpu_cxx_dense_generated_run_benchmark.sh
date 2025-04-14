@@ -34,7 +34,7 @@ do
       input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
       folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
       mkdir -p "$folder"
-      for metric in "l1" # "euclid" "pearson"
+      for metric in "cosine" #"l1" "euclid" "pearson"
       do
         name="benchmark_"${method}_${metric}_${cells}x${features}
         output="$folder"/_${method}_${metric}.csv
