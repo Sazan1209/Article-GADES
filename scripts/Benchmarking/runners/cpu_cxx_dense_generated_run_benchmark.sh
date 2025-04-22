@@ -19,7 +19,7 @@ script="$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript/GadesCScript.sh
 
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 
-for method in "gades" "arma" "af_cpu"
+for method in "gades" #"arma" "af_cpu"
 do
   for cells in "10" "100" "1000" "10000"
   do
@@ -34,7 +34,7 @@ do
       input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
       folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
       mkdir -p "$folder"
-      for metric in "cosine" #"l1" "euclid" "pearson"
+      for metric in "spearman" #"cosine" "l1" "euclid" "pearson"
       do
         name="benchmark_"${method}_${metric}_${cells}x${features}
         output="$folder"/_${method}_${metric}.csv

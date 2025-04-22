@@ -1,7 +1,7 @@
 import os
 
 import sys
-from scipy.stats import kendalltau
+from scipy.stats import kendalltau, spearmanr
 from scipy.spatial.distance import pdist, squareform
 import pandas as pd
 import numpy as np
@@ -81,6 +81,8 @@ if __name__ == '__main__':
                 output = squareform(pdist(np_array, 'cityblock'))
             elif args.metric == 'cosine':
                 output = squareform(pdist(np_array, 'cosine'))
+            elif args.metric == 'spearman':
+                output = spearmanr(np_array)
 
         else:
             if args.metric == 'kendall':
@@ -89,6 +91,8 @@ if __name__ == '__main__':
                 output = df.T.corr(method=lambda a, b: np.sum(np.abs(a - b)))
             elif args.metric == 'cosine':
                 output = df.T.corr(method=lambda a, b: np.dot(a, b) / (norm(a) * norm(b)))
+            elif args.metric == 'spearman':
+                output = df.T.corr(method='spearman')
         if args.profile:
             result_memory_usage = process.memory_info().rss
             output_usage = sys.getsizeof(output)

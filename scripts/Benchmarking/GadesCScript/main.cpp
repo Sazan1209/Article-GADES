@@ -46,7 +46,7 @@ void validate(int argc, char* argv[])
     std::exit(1);
   }
   std::string metric = argv[4];
-  std::vector valid_metrics = {"euclid", "pearson", "l1", "cosine"};
+  std::vector valid_metrics = {"euclid", "pearson", "l1", "cosine", "spearman"};
   if (std::all_of(
         valid_metrics.begin(), valid_metrics.end(), [&](auto curr) { return metric != curr; }))
   {
@@ -179,6 +179,10 @@ int main(int argc, char* argv[])
     else if (metric == "cosine")
     {
       measurements = iterate(times, [&]() { CalcDistanceCosine(a, res, 0, threads); });
+    }
+    else if (metric == "spearman")
+    {
+      measurements = iterate(times, [&]() { CalcDistanceSpearman(a, res, 0, threads); });
     }
   }
   arma::vec measure_vec(measurements);

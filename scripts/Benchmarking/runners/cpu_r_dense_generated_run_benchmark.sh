@@ -21,7 +21,7 @@ do
       input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
       folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
       mkdir -p "$folder"
-      for metric in "cosine" #"manhattan" "kendall"
+      for metric in "spearman" #"cosine" "manhattan" "kendall"
       do
         if [[ $metric == "cosine" && $method == "factoextra" ]]; then continue; fi
         name="benchmark_"${method}_${metric}_${cells}x${features}
