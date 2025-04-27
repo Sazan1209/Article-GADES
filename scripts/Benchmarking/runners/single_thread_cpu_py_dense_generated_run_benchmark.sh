@@ -12,7 +12,7 @@ do
         for features in "10" "100" "1000" "10000" "100000"
         do
             num_elements=$(( cells * features ))
-            if [[ $num_elements > 100000 ]]
+            if [[ $num_elements != 1000000 ]]
             then
                 continue
             fi

@@ -19,7 +19,7 @@ import psutil
 def parse_args():
     parser = ArgumentParser('Python benchmarking')
     parser.add_argument('--num_threads', default=24, type=int)
-    parser.add_argument('--metric', required=True, choices=['kendall', 'l1', 'cosine'])
+    parser.add_argument('--metric', required=True, choices=['kendall', 'l1', 'cosine', 'spearman'])
     parser.add_argument('--method', required=True, choices=['pandas', 'pythonic'])
     parser.add_argument('--input', required=True, help='Path to dataset')
     parser.add_argument('--times', required=True, help='How many times to do benchmarking', type=int)
@@ -58,7 +58,9 @@ if __name__ == '__main__':
 
     functions = {
         'kendall': calculate_kendall,
-        'l1': None
+        'l1': None,
+        'cosine': None,
+        'spearman': None
     }
 
     function = functions[args.metric]
@@ -90,7 +92,7 @@ if __name__ == '__main__':
             elif args.metric == 'l1':
                 output = df.T.corr(method=lambda a, b: np.sum(np.abs(a - b)))
             elif args.metric == 'cosine':
-                output = df.T.corr(method=lambda a, b: np.dot(a, b) / (norm(a) * norm(b)))
+                output = df.T.corr(method=lambda a, b: np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
             elif args.metric == 'spearman':
                 output = df.T.corr(method='spearman')
         if args.profile:

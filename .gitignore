@@ -1,2 +1,5 @@
 *.ipynb_checkpoints*
 **/CMakeLists.txt.user
+scripts/Benchmarking/GadesCScript/buildRelease/
+scripts/Benchmarking/GadesCScript/bin
+logs/
