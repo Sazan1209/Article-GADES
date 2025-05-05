@@ -58,7 +58,8 @@ inline af::array af_eucl_dist1(const af::array& a)
     af::array sad = af::sqrt(af::sum(square(bvec_tiled - a)));
     dist_mat(af::span, jj) = sad.T();
   }
-
+  dist_mat.eval();
+  af::sync();
   return dist_mat;
 }
 
@@ -74,7 +75,8 @@ inline af::array af_l1_dist(const af::array& a)
     af::array sad = af::sum(af::abs(bvec_tiled - a));
     dist_mat(af::span, jj) = sad.T();
   }
-
+  dist_mat.eval();
+  af::sync();
   return dist_mat;
 }
 
@@ -92,7 +94,8 @@ inline af::array af_eucl_dist2(const af::array& a)
 
   af::array dist_mod = af::sqrt(af::sum(square(a_tiled - b_tiled)));
   af::array dist_mat = af::moddims(dist_mod, alen, alen);
-
+  dist_mat.eval();
+  af::sync();
   return dist_mat;
 }
 
@@ -106,7 +109,8 @@ inline af::array af_pearson_dist(const af::array& a)
   a_centered /= af::tile(a_norm, feat_len, 1);
 
   af::array cov = af::matmul(a_centered, a_centered, AF_MAT_TRANS);
-
+  cov.eval();
+  af::sync();
   return cov;
 }
 
@@ -117,7 +121,8 @@ inline af::array af_cosine_dist(const af::array& a)
   af::array a_norm = af::sqrt(af::sum(square(a), 0));
   af::array a_centered = a / af::tile(a_norm, feat_len, 1);
   af::array cov = af::matmul(a_centered, a_centered, AF_MAT_TRANS);
-
+  cov.eval();
+  af::sync();
   return cov;
 }
 

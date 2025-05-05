@@ -22,13 +22,14 @@ do
       input="${ROOT_FOLDER}"/Datasets/Generated/${cells}_cells_${features}_features.csv
       folder="${ROOT_FOLDER}"/results/GeneratedDense/${cells}_cells_${features}_features/
       mkdir -p "$folder"
-      for metric in "spearman" #"cosine" "manhattan" "kendall"
+      for metric in "spearman" "cosine" "manhattan" #"kendall"
       do
         if [[ $metric == "cosine" && $method == "factoextra" ]]; then continue; fi
         name="benchmark_"${method}_${metric}_${cells}x${features}
         output="$folder"/_${method}_${metric}.csv
+        if [[ $metric == "manhattan" ]]; then output="$folder"/_${method}_l1.csv; fi
         logs="${ROOT_FOLDER}"/logs/$name
-        sbatch --job-name=$name  --cpus-per-task=24 -o "$logs" -D $(dirname $script) "$script" "$input" $method 25 $metric "$output" FALSE FALSE 24
+        sbatch --job-name=$name  --cpus-per-task=24 -o "$logs" -D $(dirname $script) "$script" "$input" $method 25 $metric "$output" TRUE FALSE 24
       done
     done
   done

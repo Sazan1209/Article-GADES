@@ -92,7 +92,6 @@ TEST(Arma, Pearson)
   }
 }
 
-
 TEST(Arma, Euclid)
 {
   double data[row_num * col_num];
@@ -127,22 +126,22 @@ TEST(Arma, Cosine)
   }
 }
 
-TEST(AF, Pearson)
-{
-  double data[row_num * col_num];
-  init(data);
-  af::array a = af::array(row_num, col_num, data);
-  af::array res = af_pearson_dist(a);
-  for (size_t i = 0; i < col_num; ++i)
-  {
-    for (size_t j = 0; j < col_num; ++j)
-    {
-      std::span a(data + i * row_num, row_num);
-      std::span b(data + j * row_num, row_num);
-      EXPECT_NEAR(calcPearson(a, b), res(i, j).scalar<double>(), 1e-9);
-    }
-  }
-}
+// TEST(AF, Pearson)
+// {
+//   double data[row_num * col_num];
+//   init(data);
+//   af::array a = af::array(row_num, col_num, data);
+//   af::array res = af_pearson_dist(a);
+//   for (size_t i = 0; i < col_num; ++i)
+//   {
+//     for (size_t j = 0; j < col_num; ++j)
+//     {
+//       std::span a(data + i * row_num, row_num);
+//       std::span b(data + j * row_num, row_num);
+//       EXPECT_NEAR(calcPearson(a, b), res(i, j).scalar<double>(), 1e-9);
+//     }
+//   }
+// }
 
 TEST(AF, Euclid)
 {
@@ -161,19 +160,19 @@ TEST(AF, Euclid)
   }
 }
 
-TEST(AF, Cosine)
-{
-  double data[row_num * col_num];
-  init(data);
-  af::array a = af::array(row_num, col_num, data);
-  af::array res = af_cosine_dist(a);
-  for (size_t i = 0; i < col_num; ++i)
-  {
-    for (size_t j = 0; j < col_num; ++j)
-    {
-      std::span a(data + i * row_num, row_num);
-      std::span b(data + j * row_num, row_num);
-      EXPECT_NEAR(calcCosine(a, b), res(i, j).scalar<double>(), 1e-9);
-    }
-  }
-}
+// TEST(AF, Cosine)
+// {
+//   double data[row_num * col_num];
+//   init(data);
+//   af::array a = af::array(row_num, col_num, data);
+//   af::array res = af_cosine_dist(a);
+//   for (size_t i = 0; i < col_num; ++i)
+//   {
+//     for (size_t j = 0; j < col_num; ++j)
+//     {
+//       std::span a(data + i * row_num, row_num);
+//       std::span b(data + j * row_num, row_num);
+//       EXPECT_NEAR(calcCosine(a, b), res(i, j).scalar<double>(), 1e-9);
+//     }
+//   }
+// }

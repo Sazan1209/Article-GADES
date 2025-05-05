@@ -7,7 +7,6 @@ march=($(srun --partition=$2 gcc -march=native -Q --help=target | grep march))
 march=${march[1]}
 echo "Determined march for partition ${PARTITION} is ${march}"
 
-
 cd "$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript
 {
   cmake -S . -B buildRelease -D GADES_MARCH=${march} &&
@@ -16,6 +15,7 @@ cd "$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript
 } || { echo "Failed to compile script"; exit 1; }
 
 script="$ROOT_FOLDER"/scripts/Benchmarking/GadesCScript/GadesCScript.sh
+export {OMP_NUM_THREADS,OPENBLAS_NUM_THREADS}=24
 
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 
