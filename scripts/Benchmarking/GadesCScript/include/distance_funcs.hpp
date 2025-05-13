@@ -38,8 +38,6 @@ inline arma::mat arma_dist_cosine(const arma::mat& a)
   return res;
 }
 
-// arma doesn't suppot kendall
-
 inline static af::array square(const af::array& a)
 {
   return a * a;

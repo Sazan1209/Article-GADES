@@ -21,7 +21,7 @@ add_library(deps INTERFACE)
 target_link_libraries(deps INTERFACE ${ARMADILLO_LIBRARIES} ArrayFire::af GADES2)
 target_include_directories(deps INTERFACE include ${ARMADILLO_INCLUDE_DIRS})
 
-add_executable(GadesCScript main.cpp)
+add_executable(GadesCScript src/main.cpp)
 target_link_libraries(GadesCScript deps)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
