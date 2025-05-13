@@ -302,7 +302,9 @@ int main(int argc, char* argv[])
     {
       auto [row_count, col_count, data] = read_csv(data_in);
       MatrixView<const double> a = {
-        .row_num = row_count, .col_num = col_count, .data = data.data()};
+        .row_num = static_cast<size_t>(row_count),
+        .col_num = static_cast<size_t>(col_count),
+        .data = data.data()};
       measurements = iterate_gades(a, threads, metric, times);
     }
     else
@@ -312,8 +314,8 @@ int main(int argc, char* argv[])
         .vals = vals.data(),
         .rows = rows.data(),
         .col_offsets = col_offsets.data(),
-        .col_num = col_count,
-        .row_num = row_count,
+        .col_num = static_cast<size_t>(col_count),
+        .row_num = static_cast<size_t>(row_count),
       };
       measurements = iterate_gades(a, threads, metric, times);
     }
