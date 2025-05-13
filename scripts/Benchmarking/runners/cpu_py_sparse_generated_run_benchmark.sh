@@ -14,7 +14,7 @@ do
     do
       for sparsity in "0.5" "0.75" "0.9" "0.95" "0.99"
         num_elements=$(( cells * features ))
-        if [[ $num_elements > 10000000 ]]
+        if [[ $num_elements > 10000000 || $num_elements < 100000]]
         then
           continue
         fi

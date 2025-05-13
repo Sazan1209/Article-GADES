@@ -15,7 +15,7 @@ do
     do
       num_elements=$(( cells * features ))
 
-      if [[ $num_elements > 10000000 ]]
+      if [[ $num_elements > 10000000 || $num_elements < 100000]]
       then
         continue
       fi
