@@ -107,7 +107,7 @@ std::vector<double> bench_dense(Config conf)
   }
 
   std::vector<double> measurements;
-  if (conf.metric == "af_cpu")
+  if (conf.method == "af_cpu")
   {
     af::array a = af::array(row_count, col_count, data_vec.data());
     if (conf.metric == "euclid")
@@ -209,7 +209,7 @@ std::vector<double> bench_sparse(Config conf)
 
 
   std::vector<double> measurements;
-  if (conf.metric == "af_cpu")
+  if (conf.method == "af_cpu")
   {
     std::vector<double> data_vec = undense(coo);
     af::array a = af::array(row_num, col_num, data_vec.data());
@@ -253,49 +253,85 @@ std::vector<double> bench_sparse(Config conf)
   }
   else
   {
-    std::vector<double> vals(coo.nnz());
-    std::vector<int64_t> rows(coo.nnz());
-    std::vector<uint32_t> col_offsets(coo.num_rows() + 1, 0);
 
-    std::sort(coo.entries.begin(), coo.entries.end(), entry_t::by_ij);
-    for (size_t i = 0; i < coo.nnz(); ++i)
+
+    if (conf.metric == "spearman")
     {
-      vals[i] = coo.entries[i].e;
-      rows[i] = coo.entries[i].j;
-      ++col_offsets[coo.entries[i].i + 1];
-    }
-    for (size_t i = 1; i <= coo.num_rows(); ++i)
-    {
-      col_offsets[i] += col_offsets[i - 1];
-    }
-    MatrixViewCSC<const double, const int64_t, const uint32_t> a{
-      .vals = vals.data(),
-      .rows = rows.data(),
-      .col_offsets = col_offsets.data(),
-      .col_num = col_num,
-      .row_num = row_num,
-    };
-    std::vector<double> res_data(col_num * col_num);
-    MatrixView res{
-      .row_num = col_num,
-      .col_num = col_num,
-      .data = res_data.data(),
-    };
+      std::vector<double> vals(coo.nnz());
+      std::vector<int32_t> rows(coo.nnz());
+      std::vector<uint32_t> col_offsets(coo.num_rows() + 1, 0);
 
-
-    if (conf.metric == "euclid" || conf.metric == "pearson" || conf.metric == "spearman")
+      std::sort(coo.entries.begin(), coo.entries.end(), entry_t::by_ij);
+      for (size_t i = 0; i < coo.nnz(); ++i)
+      {
+        vals[i] = coo.entries[i].e;
+        rows[i] = coo.entries[i].j;
+        ++col_offsets[coo.entries[i].i + 1];
+      }
+      for (size_t i = 1; i <= coo.num_rows(); ++i)
+      {
+        col_offsets[i] += col_offsets[i - 1];
+      }
+      MatrixViewCSC<const double, const int32_t, const uint32_t> a{
+        .vals = vals.data(),
+        .rows = rows.data(),
+        .col_offsets = col_offsets.data(),
+        .col_num = col_num,
+        .row_num = row_num,
+      };
+      std::vector<double> res_data(col_num * col_num);
+      MatrixView res{
+        .row_num = col_num,
+        .col_num = col_num,
+        .data = res_data.data(),
+      };
+      measurements =
+        iterate(conf.iter_count, [&]() { CalcDistanceSpearman(a, res, 0, conf.worker_count); });
+    }
+    else if (conf.metric == "euclid" || conf.metric == "pearson")
     {
       std::abort();
     }
-    else if (conf.metric == "l1")
+    else
     {
-      measurements =
-        iterate(conf.iter_count, [&]() { CalcDistanceL1(a, res, 0, conf.worker_count); });
-    }
-    else if (conf.metric == "cosine")
-    {
-      measurements =
-        iterate(conf.iter_count, [&]() { CalcDistanceCosine(a, res, 0, conf.worker_count); });
+      std::vector<double> vals(coo.nnz());
+      std::vector<int64_t> rows(coo.nnz());
+      std::vector<uint32_t> col_offsets(coo.num_rows() + 1, 0);
+
+      std::sort(coo.entries.begin(), coo.entries.end(), entry_t::by_ij);
+      for (size_t i = 0; i < coo.nnz(); ++i)
+      {
+        vals[i] = coo.entries[i].e;
+        rows[i] = coo.entries[i].j;
+        ++col_offsets[coo.entries[i].i + 1];
+      }
+      for (size_t i = 1; i <= coo.num_rows(); ++i)
+      {
+        col_offsets[i] += col_offsets[i - 1];
+      }
+      MatrixViewCSC<const double, const int64_t, const uint32_t> a{
+        .vals = vals.data(),
+        .rows = rows.data(),
+        .col_offsets = col_offsets.data(),
+        .col_num = col_num,
+        .row_num = row_num,
+      };
+      std::vector<double> res_data(col_num * col_num);
+      MatrixView res{
+        .row_num = col_num,
+        .col_num = col_num,
+        .data = res_data.data(),
+      };
+      if (conf.metric == "l1")
+      {
+        measurements =
+          iterate(conf.iter_count, [&]() { CalcDistanceL1(a, res, 0, conf.worker_count); });
+      }
+      else if (conf.metric == "cosine")
+      {
+        measurements =
+          iterate(conf.iter_count, [&]() { CalcDistanceCosine(a, res, 0, conf.worker_count); });
+      }
     }
   }
   return measurements;
