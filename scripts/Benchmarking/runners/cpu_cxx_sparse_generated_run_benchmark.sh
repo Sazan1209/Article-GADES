@@ -35,7 +35,7 @@ do
         input="${ROOT_FOLDER}"/Datasets/GeneratedSparse/${cells}_cells_${features}_features/$sparsity.mtx
         folder="${ROOT_FOLDER}"/results/GeneratedSparse/${cells}_cells_${features}_features
         mkdir -p "$folder"
-        for metric in "cosine" "l1"  # "spearman" "euclid" "pearson"
+        for metric in "spearman" #"cosine" "l1" "euclid" "pearson"
         do
           name=${method}_${metric}_${cells}x${features}x${sparsity}"_benchmark"
           output="$folder"/${sparsity}_${method}_${metric}.csv

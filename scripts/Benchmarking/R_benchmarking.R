@@ -47,7 +47,7 @@ for (i in 1:times) {
 
     end_time <- as.numeric(Sys.time()) * 1000000
     measurements[i] <- end_time - st_t
-    print(distMatrix_mtrx.nrow, distMatrix_mtrx.ncol)
+    
     gc()
 }
 

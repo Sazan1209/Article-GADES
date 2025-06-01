@@ -5,7 +5,7 @@ script="$ROOT_FOLDER"/scripts/Benchmarking/python_benchmarking.sh
 
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 
-for method in "pandas" "pythonic"
+for method in  "pythonic" #"pandas"
 do
     for cells in "10" "100" "1000" "10000"
     do

@@ -6,7 +6,7 @@ script="$ROOT_FOLDER"/scripts/Benchmarking/python_benchmarking.sh
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 export {OMP_NUM_THREADS,OPENBLAS_NUM_THREADS}=24
 
-for method in "pandas" "pythonic"
+for method in  "pythonic" #"pandas"
 do
   for cells in "10" "100" "1000" "10000"
   do
@@ -23,7 +23,7 @@ do
         folder="${ROOT_FOLDER}"/results/GeneratedSparse/${cells}_cells_${features}_features
         mkdir -p "$folder"
 
-        for metric in "spearman" "cosine" "l1" #"spearman" "kendall" "pearson"
+        for metric in "spearman" #"cosine" "l1" "spearman" "kendall" "pearson"
         do
           name=${method}_${metric}_${cells}x${features}x${sparsity}"_benchmark"
           output="$folder"/${sparsity}_${method}_${metric}.csv

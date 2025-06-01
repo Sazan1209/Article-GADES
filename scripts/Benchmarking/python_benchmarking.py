@@ -57,7 +57,7 @@ if __name__ == '__main__':
             elif args.metric == 'cosine':
                 output = squareform(pdist(np_array, 'cosine'))
             elif args.metric == 'spearman':
-                output = spearmanr(np_array)
+                output = spearmanr(np_array, axis=1)
 
         else:
             if args.metric == 'kendall':
