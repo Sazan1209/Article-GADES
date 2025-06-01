@@ -15,12 +15,13 @@ import scipy.io
 import gc
 from tqdm.contrib.concurrent import process_map
 import psutil
+from sklearn.metrics import pairwise_distances
 
 def parse_args():
     parser = ArgumentParser('Python benchmarking')
     parser.add_argument('--num_threads', default=24, type=int)
     parser.add_argument('--metric', required=True, choices=['kendall', 'l1', 'cosine', 'spearman'])
-    parser.add_argument('--method', required=True, choices=['pandas', 'pythonic'])
+    parser.add_argument('--method', required=True, choices=['pandas', 'pythonic', 'scikit'])
     parser.add_argument('--input', required=True, help='Path to dataset')
     parser.add_argument('--times', required=True, help='How many times to do benchmarking', type=int)
     parser.add_argument('--output', required=True, help='Path to output file')
@@ -31,6 +32,7 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     process = psutil.Process(os.getpid())
+    mtx = None
     if args.input.endswith('.mtx'):
         mtx = scipy.io.mmread(args.input)
         if args.profile:
@@ -40,9 +42,9 @@ if __name__ == '__main__':
         df = pd.read_csv(args.input, index_col=0)
         if args.profile:
             base_memory_usage = process.memory_info().rss
+        mtx = df.values
 
     np_array = df.values
-    print(np_array.shape)
 
     if args.profile:
         memories = []
@@ -59,7 +61,7 @@ if __name__ == '__main__':
             elif args.metric == 'spearman':
                 output = spearmanr(np_array, axis=1)
 
-        else:
+        elif args.method == 'pandas':
             if args.metric == 'kendall':
                 output = df.T.corr(method='kendall')
             elif args.metric == 'l1':
@@ -68,6 +70,8 @@ if __name__ == '__main__':
                 output = df.T.corr(method=lambda a, b: np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
             elif args.metric == 'spearman':
                 output = df.T.corr(method='spearman')
+        else:
+            output = pairwise_distances(X=mtx, metric=args.metric, n_jobs=args.num_threads)
 
         if args.profile:
             result_memory_usage = process.memory_info().rss

@@ -6,7 +6,7 @@ script="$ROOT_FOLDER"/scripts/Benchmarking/python_benchmarking.sh
 [[ -a $script ]] || { echo "Couldn't find script at ${script}"; exit 1; }
 export {OMP_NUM_THREADS,OPENBLAS_NUM_THREADS}=24
 
-for method in  "pythonic" #"pandas"
+for method in  "scikit" #"pythonic" "pandas"
 do
   for cells in "10" "100" "1000" "10000"
   do
@@ -23,8 +23,9 @@ do
         folder="${ROOT_FOLDER}"/results/GeneratedSparse/${cells}_cells_${features}_features
         mkdir -p "$folder"
 
-        for metric in "spearman" #"cosine" "l1" "spearman" "kendall" "pearson"
-        do
+        for metric in "cosine" "l1" #"spearman" "spearman" "kendall" "pearson"
+        do        
+          if [[ $metric == "spearman" && $method == "scikit" ]]; then continue; fi
           name=${method}_${metric}_${cells}x${features}x${sparsity}"_benchmark"
           output="$folder"/${sparsity}_${method}_${metric}.csv
           logs="${ROOT_FOLDER}/logs/$name.out"
